@@ -3,8 +3,8 @@ import UserService from '../services/UserService.js';
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await UserService.getAllUsers();
-        res.status(200).json(users);
+        const result = await UserService.getAllUsers();
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

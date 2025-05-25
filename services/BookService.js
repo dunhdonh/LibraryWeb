@@ -5,7 +5,12 @@ import mongoose from "mongoose";
 
 
 const getAllBooks = async () => {
-    return await Book.find().populate("category");
+    const books = await Book.find().populate("category");
+    const totalBooks = await Book.countDocuments();
+    return {
+        books: books,
+        totalBooks: totalBooks}
+
     }
 
 const getBookById = async (id) => {

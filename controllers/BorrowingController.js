@@ -2,8 +2,8 @@ import BorrowingService from "../services/BorrowingService.js";
 
 const getAllBorrowings = async (req, res) => {
     try {
-        const borrowings = await BorrowingService.getAllBorrowings();
-        res.status(200).json(borrowings);
+        const result = await BorrowingService.getAllBorrowings();
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

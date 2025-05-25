@@ -2,7 +2,12 @@ import Category from '../models/Category.js';
 import mongoose from 'mongoose';
 
 const getAllCategories = async () => {
-    return await Category.find();
+    const categories = await Category.find();
+    const totalCategories = await Category.countDocuments();
+    return {
+        categories: categories,
+        totalCategories: totalCategories
+    };
 }
 
 const getCategoryById = async (id) => {

@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
-import { generateAccessToken, generateRefreshToken } from './TokenService.js';
+import {generateAccessToken, generateRefreshToken, generateOtpToken, verifyOtpToken, verifyResetPasswordToken, generateResetPasswordToken} from './TokenService.js';
+import sendEmail from '../utils/sendEmail.js';
+import crypto from 'crypto';
 
 const login = async (username, password) => {
     const user = await User.findOne({ username });
@@ -68,8 +70,52 @@ const logout = async (userId) => {
     return { message: 'Logged out successfully' };
 }
 
+const sendOtp = async (email) => {
+    const { otp, token } = generateOtpToken(email);
+    // Gửi OTP qua email (giả sử có hàm sendEmail)
+    await sendEmail.sendOtpEmail(email, otp);
+    return { message: 'OTP sent successfully' , token };
+}
+
+const verifyOtp = async (token, otp) => {
+    const result = verifyOtpToken(token, otp);
+    if (!result.success) {
+        throw new Error(result.message);
+    }
+    const resetToken = generateResetPasswordToken(result.email);
+    return {
+        message: 'OTP verified successfully',
+        success: true,
+        email: result.email,
+        resetToken: resetToken
+    };
+}
+
+const resetPassword = async (token, newPassword) => {
+    try {
+    const decoded = verifyResetPasswordToken(token);
+ 
+    const email = decoded.email;
+
+    const user = await User.findOne({ email });
+    if (!user) throw new Error('User không tồn tại');
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.passwordHash = hashedPassword;
+    await user.save();
+
+    return { message: 'Mật khẩu đã được cập nhật' };
+  } catch (err) {
+    throw new Error('Token không hợp lệ hoặc đã hết hạn');
+  }
+}
+
+
 export default {
     login,
     register, 
-    logout
+    logout,
+    sendOtp,
+    verifyOtp,
+    resetPassword
 };

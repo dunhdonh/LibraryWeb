@@ -3,7 +3,12 @@ import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 
 const getAllUsers = async () => {
-    return await User.find().select('-passwordHash'); // Exclude password from the result
+    const users = await User.find().select('-passwordHash'); // Exclude password from the result
+    const totalUsers = await User.countDocuments();
+    return {
+        users: users,
+        totalUsers: totalUsers
+    };
 }
 
 const getUserById = async (id) => {

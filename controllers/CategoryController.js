@@ -2,8 +2,8 @@ import CategoryService from "../services/CategoryService.js";
 
 const getAllCategories = async (req, res) => {
     try {
-        const categories = await CategoryService.getAllCategories();
-        res.status(200).json(categories);
+        const result = await CategoryService.getAllCategories();
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
