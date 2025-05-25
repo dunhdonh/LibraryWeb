@@ -1,7 +1,8 @@
 // server.js
-require('dotenv').config();
-const mongoose = require('mongoose');
-const app = require('./app'); // bạn cần tạo app.js
+import dotenv from 'dotenv';
+dotenv.config(); // Nạp biến môi trường từ file .env
+import mongoose from 'mongoose'; // Thư viện Mongoose để kết nối MongoDB
+import app from './App.js'; // Import ứng dụng Express từ App.js
 
 const PORT = process.env.PORT || 5000;
 
