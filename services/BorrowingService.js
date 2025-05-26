@@ -24,7 +24,7 @@ const getBorrowingById = async (id) => {
 }
 
 const createBorrowing = async (borrowingData) => {
-    const { bookId, userId, borrowDate, returnDate, status } = borrowingData;
+    const { bookId, userId, borrowDate, dueDate, status } = borrowingData;
     if (!bookId || !userId || !status) {
         throw new Error('All fields are required');
     }
@@ -50,7 +50,7 @@ const createBorrowing = async (borrowingData) => {
         bookId,
         userId,
         borrowDate,
-        returnDate,
+        dueDate,
         status
     });
 
