@@ -58,7 +58,7 @@ function groupBorrowingsByUser(borrowings) {
     return Object.values(grouped);
 }
 
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 8 * * *', async () => {
   console.log('🔔 Chạy cron job nhắc lịch trả sách hôm nay');
   try {
     const todayStart = new Date();
