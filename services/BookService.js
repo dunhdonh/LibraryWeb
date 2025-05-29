@@ -4,14 +4,26 @@ import Borrowing from "../models/Borrowing.js";
 import mongoose from "mongoose";
 
 
-const getAllBooks = async () => {
-    const books = await Book.find().populate("category");
-    const totalBooks = await Book.countDocuments();
-    return {
-        books: books,
-        totalBooks: totalBooks}
+const getAllBooks = async ({category, search}) => {
+    const filter = {};
 
+    if (category) {
+        filter.category = category;
     }
+
+    if (search) {
+        filter.title = { $regex: search, $options: 'i' }; // Tìm theo tên (không phân biệt hoa thường)
+    }
+
+    const books = await Book.find(filter).populate("category");
+    const totalBooks = await Book.countDocuments(filter); // Đếm theo bộ lọc
+
+    return {
+        books,
+        totalBooks
+    };
+};
+
 
 const getBookById = async (id) => {
       return await Book.findById(id).populate("category");

@@ -10,7 +10,7 @@ const borrowingSchema = new mongoose.Schema({
     required: true
   },
   returnDate: { type: Date },
-  status: { type: String, enum: ['reserved', 'borrowed', 'returned', 'late'], default: 'borrowed' },
+  status: { type: String, enum: ['reserved', 'borrowed', 'returned', 'late', 'cancelled'], default: 'borrowed' },
 }, { timestamps: true });
 
 const Borrowing = mongoose.model('Borrowing', borrowingSchema);

@@ -2,7 +2,8 @@ import BookService from '../services/BookService.js';
 
 const getAllBooks = async (req, res) => {
     try {
-        const result = await BookService.getAllBooks();
+        const { search, category } = req.query;
+        const result = await BookService.getAllBooks({ search, category });
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: error.message });

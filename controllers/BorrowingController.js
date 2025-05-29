@@ -2,7 +2,8 @@ import BorrowingService from "../services/BorrowingService.js";
 
 const getAllBorrowings = async (req, res) => {
     try {
-        const result = await BorrowingService.getAllBorrowings();
+        const { status } = req.query;
+        const result = await BorrowingService.getAllBorrowings({ status });
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -60,9 +61,9 @@ const deleteBorrowing = async (req, res) => {
 
 const getBorrowingsByUserId = async (req, res) => {
     const { userId } = req.params;
-
+    const { status } = req.query;
     try {
-        const borrowings = await BorrowingService.getBorrowingsByUserId(userId);
+        const borrowings = await BorrowingService.getBorrowingsByUserId({userId,  status});
         res.status(200).json(borrowings);
     } catch (error) {
         res.status(500).json({ message: error.message });

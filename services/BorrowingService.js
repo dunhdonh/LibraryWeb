@@ -3,9 +3,14 @@ import mongoose from 'mongoose';
 import Book from '../models/Book.js';
 import User from '../models/User.js';
 
-const getAllBorrowings = async () => {
-    const borrowings = await Borrowing.find()
-        .populate('bookId', 'title author')
+const getAllBorrowings = async ({status}) => {
+    const filter = {};
+    if (status) {
+        filter.status = status;
+    }
+    const borrowings = await Borrowing.find(filter)
+        .sort({ borrowDate: -1 }) // Sắp xếp theo ngày mượn mới nhất
+        .populate('bookId', 'title author image')
         .populate('userId', 'name email');
     const totalBorrowings = await Borrowing.countDocuments();
     return {
@@ -19,7 +24,7 @@ const getBorrowingById = async (id) => {
         throw new Error('Invalid borrowing ID');
     }
     return await Borrowing.findById(id)
-        .populate('bookId', 'title author')
+        .populate('bookId', 'title author image')
         .populate('userId', 'name email');
 }
 
@@ -127,20 +132,28 @@ const deleteBorrowing = async (id) => {
     return { message: 'Borrowing deleted successfully' };
 }
 
-const getBorrowingsByUserId = async (userId) => {
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-        throw new Error('Invalid user ID');
-    }
+const getBorrowingsByUserId = async ({ userId, status }) => {
+    console.log("getBorrowingsByUserId called with userId:", userId, "and status:", status);
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new Error('Invalid user ID');
+  }
 
-    const borrowings = await Borrowing.find({ userId: userId })
-        .populate('bookId', 'title author')
+  const filter = { userId };
 
-    if (borrowings.length === 0) {
-        throw new Error('No borrowings found for this user');
-    }
+  if (status) {
+    filter.status = status;
+  }
 
-    return borrowings;
-}
+  const borrowings = await Borrowing.find(filter)
+    .populate('bookId', 'title author image');
+
+  if (borrowings.length === 0) {
+    throw new Error('No borrowings found for this user');
+  }
+
+  return borrowings;
+};
+
 
 const getBorrowingsByBookId = async (bookId) => {
     if (!mongoose.Types.ObjectId.isValid(bookId)) {

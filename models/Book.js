@@ -8,7 +8,8 @@ const bookSchema = new mongoose.Schema({
   publisher: { type: String },
   year: { type: Number },
   stock: { type: Number, default: 0 },  // số lượng sách hiện có
-  borrowCount: { type: Number, default: 0 }
+  borrowCount: { type: Number, default: 0 },
+  summary: { type: String }
 }, { timestamps: true });
 
 const Book = mongoose.model('Book', bookSchema);

@@ -23,20 +23,19 @@ const login = async (username, password) => {
     await user.save();
 
     return {
-        user: {
-            id: user._id,
-            username: user.username,
-            email: user.email,
-            name: user.name,
-            role: user.role
-        },
         accessToken,
-        refreshToken
+        refreshToken,
+        user: {
+            _id: user._id,
+            username: user.username,
+            avatar: user.avatar,
+            role: user.role
+        }
     };
 };
 
 const register = async (userData) => {
-    const { username, email, password} = userData;
+    const { username, email, password, avatar} = userData;
 
     if (!username || !email || !password) {
         throw new Error('All fields are required');
@@ -44,13 +43,19 @@ const register = async (userData) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-        throw new Error('Email already exists');
+        throw new Error('Email đã được sử dụng');
+    }
+
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+        throw new Error('Username đã được sử dụng');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = new User({
         username,
         email,  
+        avatar,
         passwordHash
     });
 

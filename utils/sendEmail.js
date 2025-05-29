@@ -11,9 +11,9 @@ const sendOtpEmail = async (toEmail, otp) => {
   });
 
   const mailOptions = {
-    from: '"Library System" <your_email@gmail.com>',
+    from: '"Thư viện Bookio" <your_email@gmail.com>',
     to: toEmail,
-    subject: 'Mã OTP khôi phục mật khẩu',
+    subject: '[Thư viện Bookio] Mã OTP khôi phục mật khẩu',
     html: `
       <h3>Xin chào,</h3>
       <p>Mã OTP của bạn là: <strong>${otp}</strong></p>
@@ -24,12 +24,12 @@ const sendOtpEmail = async (toEmail, otp) => {
   await transporter.sendMail(mailOptions);
 };
 
-const sendReminderEmail = async (user) =>{
+const sendReminderEmail = async (user) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD, 
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
 
@@ -42,11 +42,11 @@ const sendReminderEmail = async (user) =>{
     to: user.email,
     subject: `[Thư viện Bookio] Nhắc lịch trả sách hôm nay`,
     html: `
-      <p>Kính gửi <b>${user.name}</b>,</p>
+      <p>Kính gửi <b>${user.name ?? 'Bạn'}</b>,</p>
       <p>Thư viện Bookio xin nhắc bạn về các sách đến hạn trả hôm nay:</p>
       <ul>${bookListHtml}</ul>
       <p>Vui lòng hoàn trả sách đúng hạn.</p>
-      <p>Trân trọng,<br/>Thư viện XYZ</p>
+      <p>Trân trọng,<br/>Thư viện Bookio</p>
     `
   };
 
@@ -57,4 +57,4 @@ const sendReminderEmail = async (user) =>{
 }
 
 
-export default {sendOtpEmail, sendReminderEmail};
+export default { sendOtpEmail, sendReminderEmail };
