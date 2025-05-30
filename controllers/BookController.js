@@ -23,6 +23,16 @@ const getBookById = async (req, res) => {
     }
 }
 
+const getBooksByTitle = async (req, res) => {
+    const { title } = req.params;
+    try {
+        const books = await BookService.getBooksByTitle(title);
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 const createBook = async (req, res) => {
     try {
         const newBook = await BookService.createBook(req.body);
@@ -76,6 +86,7 @@ const getBooksByCategory = async (req, res) => {
 export default {
     getAllBooks,
     getBookById,
+    getBooksByTitle,
     createBook,
     updateBook,
     deleteBook,

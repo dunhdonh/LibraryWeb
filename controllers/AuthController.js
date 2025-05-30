@@ -1,4 +1,5 @@
 import AuthService from '../services/AuthService.js';
+import {refreshAccessToken} from '../services/TokenService.js';
 
 const login = async (req, res) => {
     const { username, password } = req.body;
@@ -70,12 +71,27 @@ const resetPassword = async (req, res) => {
   }
 }
 
+const refreshToken = async (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+        return res.status(400).json({ message: 'Token là bắt buộc' });
+    }
+
+    try {
+        const newToken = await refreshAccessToken(refreshToken);
+        res.status(200).json({ accessToken: newToken });
+    } catch (error) {
+        res.status(401).json({ message: error.message });
+    }
+}
+
 export default {
     login,
     register, 
     logout, 
     forgotPassword,
     verifyOtp, 
-    resetPassword
+    resetPassword,
+    refreshToken
 };
 

@@ -5,7 +5,7 @@ export const generateAccessToken = (user) => {
     return jwt.sign(
         { _id: user._id, role: user.role, username: user.username, avatar: user.avatar },
         process.env.JWT_ACCESS_SECRET,
-        { expiresIn: '30m' } // Token sẽ hết hạn sau 30 phút
+        { expiresIn: '30m' }
     );
 }
 
@@ -15,6 +15,17 @@ export const generateRefreshToken = (user) => {
         process.env.JWT_REFRESH_SECRET,
         { expiresIn: '7d' } // Token sẽ hết hạn sau 7 ngày
     );
+}
+
+export const refreshAccessToken = (refreshToken) => {
+    try {
+        const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        console.log('Payload từ refresh token:', payload);
+        return generateAccessToken({ _id: payload._id, role: payload.role, username: payload.username, avatar: payload.avatar });
+    } catch (error) {
+        console.error('Lỗi khi làm mới access token:', error);
+        return null; // Token không hợp lệ hoặc đã hết hạn
+    }
 }
 
 

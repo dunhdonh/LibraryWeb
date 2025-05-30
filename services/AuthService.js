@@ -122,5 +122,6 @@ export default {
     logout,
     sendOtp,
     verifyOtp,
-    resetPassword
+    resetPassword,
+    
 };

@@ -4,7 +4,7 @@ import Borrowing from "../models/Borrowing.js";
 import mongoose from "mongoose";
 
 
-const getAllBooks = async ({category, search}) => {
+const getAllBooks = async ({ category, search }) => {
     const filter = {};
 
     if (category) {
@@ -26,12 +26,18 @@ const getAllBooks = async ({category, search}) => {
 
 
 const getBookById = async (id) => {
-      return await Book.findById(id).populate("category");
+    return await Book.findById(id).populate("category");
 }
 
+const getBooksByTitle = async (title) => {
+    return Book.find({
+        title: { $regex: title, $options: 'i' } // Tìm kiếm không phân biệt hoa thường
+    }).limit(5);
+};
+
 const createBook = async (bookData) => {
-    const { title, author, categoryName,stock, imageUrl } = bookData;
-    if (!title || !author || !categoryName || !imageUrl) {
+    const { title, author, categoryName, stock, image, publisher, year, summary } = bookData;
+    if (!title || !author || !categoryName || !image) {
         throw new Error("All fields are required");
     }
 
@@ -43,9 +49,12 @@ const createBook = async (bookData) => {
     const newBook = new Book({
         title: title,
         author: author,
-        category: category._id, 
+        category: category._id,
         stock: stock || 0, // Default to 0 if not provided
-        image: imageUrl || "", // Default to empty string if not provided
+        image: image || "", // Default to empty string if not provided
+        publisher: publisher || "",
+        year: year || new Date().getFullYear(), // Default to current year if not provided
+        summary: summary || ""
     });
 
     return await newBook.save();
@@ -54,6 +63,16 @@ const createBook = async (bookData) => {
 const updateBook = async (id, updateData) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new Error("Invalid book ID");
+    }
+
+    // Nếu có categoryName, tìm category tương ứng và gán _id
+    if (updateData.categoryName) {
+        const category = await Category.findOne({ name: updateData.categoryName });
+        if (!category) {
+            throw new Error("Category not found");
+        }
+        updateData.category = category._id; // gán _id vào trường category
+        delete updateData.categoryName; // xóa categoryName để tránh lưu dư thừa
     }
 
     const updatedBook = await Book.findByIdAndUpdate(
@@ -70,6 +89,7 @@ const updateBook = async (id, updateData) => {
 };
 
 
+
 const deleteBook = async (id) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new Error("Invalid book ID");
@@ -81,7 +101,7 @@ const deleteBook = async (id) => {
         throw new Error("Book not found");
     }
 
-    await Borrowing.updateMany({ bookId: book._id }, { $unset: { bookId: "" } });
+    await Borrowing.updateMany({ bookId: deletedBook._id }, { $unset: { bookId: "" } });
 
     return { message: "Book deleted successfully" };
 };
@@ -104,6 +124,7 @@ const getBooksByCategory = async (categoryId) => {
 export default {
     getAllBooks,
     getBookById,
+    getBooksByTitle,
     createBook,
     updateBook,
     deleteBook,

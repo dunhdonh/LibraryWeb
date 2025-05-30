@@ -18,6 +18,12 @@ const getUserById = async (id) => {
     return await User.findById(id).select('-passwordHash'); // Exclude password from the result
 }
 
+const getUsersByUsername = (username) => {
+    return User.find({
+        username: { $regex: username, $options: 'i' }
+    }).limit(5);
+};
+
 const createUser = async (userData) => {
     const { username, email, name, password, role } = userData;
     if (!username || !email || !password || !role) {
@@ -81,6 +87,7 @@ const deleteUser = async (id) => {
 export default {
     getAllUsers,
     getUserById,
+    getUsersByUsername,
     createUser,
     updateUser,
     deleteUser
