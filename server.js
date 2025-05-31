@@ -95,7 +95,13 @@ const markLateBorrowings = async () => {
         { status: 'late' }
     );
 
+    const result2 = await Borrowing.updateMany(
+        { status: 'reserved', dueDate: { $lt: today } },
+        { status: 'cancelled' }
+    );
+
     console.log(`[CRON] Updated ${result.modifiedCount} borrowings to 'late' status`);
+    console.log(`[CRON] Updated ${result2.modifiedCount} borrowings to 'cancelled' status`);
 };
 
 // Schedule cron job to run every day at 00:00

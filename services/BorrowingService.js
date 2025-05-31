@@ -85,6 +85,22 @@ const updateBorrowing = async (id, updateData) => {
         updateData.returnDate = new Date(); // tự động set ngày trả
     }
 
+    // Nếu status được cập nhật thành "canceled" và trước đó không phải là "canceled"
+    if (updateData.status === 'cancelled' && borrowing.status === 'reserved') {
+        const book = await Book.findById(borrowing.bookId);
+        if (book) {
+            book.stock += 1; // Tăng stock khi hủy mượn
+            book.borrowCount -= 1; // Giảm borrowCount khi hủy mượn
+            await book.save();
+            // Cập nhật borrowingCount của user
+            const user = await User.findById(borrowing.userId);
+            if (user && user.borrowingCount > 0) {
+                user.borrowingCount -= 1; // Giảm borrowingCount khi hủy mượn
+                await user.save();
+            }
+        }
+    }
+
     const updatedBorrowing = await Borrowing.findByIdAndUpdate(
         id,
         updateData,
@@ -116,6 +132,10 @@ const deleteBorrowing = async (id) => {
     else {
         // Cập nhật book.stock tăng 1
         await Book.findByIdAndUpdate(borrowing.bookId, { $inc: { stock: 1 } });
+        // Cập nhật book.borrowCount giảm 1
+        await Book.findByIdAndUpdate(borrowing.bookId, {
+            $inc: { borrowCount: -1 }
+        });
 
         // Cập nhật user.borrowingCount giảm 1
         const user = await User.findById(borrowing.userId);
@@ -133,7 +153,6 @@ const deleteBorrowing = async (id) => {
 }
 
 const getBorrowingsByUserId = async ({ userId, status }) => {
-    console.log("getBorrowingsByUserId called with userId:", userId, "and status:", status);
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new Error('Invalid user ID');
   }

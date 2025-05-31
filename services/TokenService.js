@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-
+import User from '../models/User.js';
 export const generateAccessToken = (user) => {
     return jwt.sign(
         { _id: user._id, role: user.role, username: user.username, avatar: user.avatar },
@@ -17,11 +17,16 @@ export const generateRefreshToken = (user) => {
     );
 }
 
-export const refreshAccessToken = (refreshToken) => {
+export const refreshAccessToken = async (refreshToken) => {
     try {
         const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         console.log('Payload từ refresh token:', payload);
-        return generateAccessToken({ _id: payload._id, role: payload.role, username: payload.username, avatar: payload.avatar });
+        const user = await User.findById(payload._id);
+        if (!user) {
+            throw new Error('Người dùng không tồn tại');
+        }
+        return generateAccessToken(user);
+        
     } catch (error) {
         console.error('Lỗi khi làm mới access token:', error);
         return null; // Token không hợp lệ hoặc đã hết hạn
