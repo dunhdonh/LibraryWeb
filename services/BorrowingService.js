@@ -126,7 +126,7 @@ const deleteBorrowing = async (id) => {
 
 
     // Nếu borrowing đã được trả, không cần cập nhật gì thêm
-    if (borrowing.status === 'returned') {
+    if (borrowing.status === 'returned' || borrowing.status === 'cancelled') {
         return { message: 'Borrowing already returned, no further action needed' };
     }
     else {
